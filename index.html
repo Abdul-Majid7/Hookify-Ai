@@ -77,8 +77,11 @@
 
             try {
                 const response = await fetch(FUNCTION_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ hook: hookInput })
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ hook: hookInput })
                 });
 
                 if (!response.ok) { throw new Error(`Server Error: ${response.statusText}`); }
@@ -139,3 +142,4 @@
 </script>
 </body>
 </html>
+

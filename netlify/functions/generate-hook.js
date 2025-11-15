@@ -1,5 +1,4 @@
 // File: netlify/functions/generate-hook.js
-
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 exports.handler = async function (event, context) {
@@ -13,7 +12,6 @@ exports.handler = async function (event, context) {
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-        // This is the new, advanced prompt that tells the AI to score AND rewrite.
         const prompt = `
             You are an advanced hook analysis AI. A user has submitted a hook for review.
             The user's hook is: "${hook}"
@@ -33,34 +31,47 @@ exports.handler = async function (event, context) {
             Here is the exact JSON format to follow:
             {
               "analysis": {
-                "clarity": <score_0_to_10>,
-                "intrigue": <score_0_to_10>,
-                "impact": <score_0_to_10>,
-                "emotion": <score_0_to_10>,
-                "heatScore": <weighted_average_score_0_to_100>
+                "clarity": 8, "intrigue": 7, "impact": 6, "emotion": 5, "heatScore": 75
               },
               "suggestions": [
-                "Rewritten hook 1 (Direct & Authoritative Angle)",
-                "Rewritten hook 2 (Empathetic & Problem-Focused Angle)",
-                "Rewritten hook 3 (High-Intrigue Question Angle)"
+                "Rewritten hook 1", "Rewritten hook 2", "Rewritten hook 3"
               ]
             }
         `;
         
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
-        const jsonString = responseText.match(/\{[\s\S]*\}/)[0]; // Extract JSON from the response
-        
-        return {
-            statusCode: 200,
-            body: jsonString,
-        };
+
+        // =================================================================
+        // NEW, ROBUST CODE START
+        // This checks if the AI returned valid JSON before trying to parse it.
+        // =================================================================
+        const matchResult = responseText.match(/\{[\s\S]*\}/);
+
+        if (matchResult) {
+            const jsonString = matchResult[0];
+            return {
+                statusCode: 200,
+                body: jsonString,
+            };
+        } else {
+            // If we are here, the AI did NOT return JSON. It returned an error.
+            console.error("AI did not return valid JSON. Raw response:", responseText);
+            // We return the AI's actual error message for debugging.
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: 'The AI returned an unexpected response.', details: responseText })
+            };
+        }
+        // =================================================================
+        // NEW, ROBUST CODE END
+        // =================================================================
+
     } catch (error) {
-        console.error("AI API Error:", error);
+        console.error("AI function crashed:", error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Failed to get analysis from the AI model.' })
+            body: JSON.stringify({ error: 'The backend function encountered a critical error.' })
         };
     }
 };
-// v1.1 - Forcing a redeploy

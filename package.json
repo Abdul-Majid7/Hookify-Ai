@@ -1,0 +1,8 @@
+{
+  "name": "hookify-ai-dependency-list",
+  "version": "1.0.0",
+  "description": "Dependencies for Netlify functions",
+  "dependencies": {
+    "@google/generative-ai": "^0.1.0"
+  }
+}

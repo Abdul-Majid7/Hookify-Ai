@@ -1,29 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- The <head> and <style> sections are the same as before -->
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Hookify AI - Powered by Gemini</title>
-    <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');:root{--primary-color:#BE185D;--primary-hover:#9D174D;--bg-color:#F8FAFC;--card-bg:#FFFFFF;--text-main:#1F2937;--text-sub:#64748B;--border:#E2E8F0}body{font-family:'Inter',sans-serif;background-color:var(--bg-color);color:var(--text-main);display:flex;justify-content:center;align-items:center;padding:40px 20px;min-height:100vh;box-sizing:border-box}.container{display:grid;grid-template-columns:1.6fr 1fr;gap:50px;background:var(--card-bg);padding:40px;border-radius:24px;border:1px solid var(--border);box-shadow:0 25px 50px -12px rgba(0,0,0,0.05);max-width:1200px;width:100%}h1{margin-top:0;font-size:2.5rem;letter-spacing:-0.025em;color:#111827}.subtitle{color:var(--text-sub);margin-bottom:2rem;line-height:1.6;font-size:1.1rem}textarea{width:100%;height:120px;padding:16px;border:1px solid var(--border);border-radius:12px;font-family:inherit;font-size:1rem;resize:vertical;transition:all 0.2s;box-sizing:border-box;background-color:#F8FAFC}textarea:focus{outline:none;border-color:var(--primary-color);background-color:#fff;box-shadow:0 0 0 4px rgba(190,24,93,0.1)}.btn{background-color:var(--primary-color);color:white;border:none;padding:16px 32px;border-radius:12px;font-weight:600;font-size:1rem;cursor:pointer;width:100%;margin-top:1.5rem;transition:background-color 0.2s,transform 0.2s}.btn:hover{background-color:var(--primary-hover);transform:translateY(-2px)}.btn:disabled{background-color:#9CA3AF;cursor:not-allowed;transform:none}.suggestions-area{margin-top:40px;display:none}.suggestion-card{background:#F8FAFC;border:1px solid var(--border);padding:20px;border-radius:10px;margin-bottom:16px}.tag{font-size:0.75rem;text-transform:uppercase;font-weight:700;color:var(--primary-color);margin-bottom:8px;display:block;letter-spacing:0.5px}.suggestion-text{font-size:1.05rem;line-height:1.6;color:var(--text-main)}.right-panel{display:flex;flex-direction:column;align-items:center}.stats-grid{width:100%;text-align:center;margin-top:40px}.powered-by{font-size:1rem;color:var(--text-sub);}.powered-by strong{color:var(--text-main);}</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hookify AI - Hook Analyzer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        :root{--primary-color:#BE185D;--primary-hover:#9D174D;--bg-color:#F8FAFC;--card-bg:#FFFFFF;--text-main:#1F2937;--text-sub:#64748B;--border:#E2E8F0}
+        body{font-family:'Inter',sans-serif;background-color:var(--bg-color);color:var(--text-main);display:flex;justify-content:center;align-items:center;padding:40px 20px;min-height:100vh;box-sizing:border-box}
+        .container{display:grid;grid-template-columns:1.6fr 1fr;gap:50px;background:var(--card-bg);padding:40px;border-radius:24px;border:1px solid var(--border);box-shadow:0 25px 50px -12px rgba(0,0,0,0.05);max-width:1200px;width:100%}
+        h1{margin-top:0;font-size:2.5rem;letter-spacing:-0.025em;color:#111827}
+        .subtitle{color:var(--text-sub);margin-bottom:2rem;line-height:1.6;font-size:1.1rem}
+        textarea{width:100%;height:120px;padding:16px;border:1px solid var(--border);border-radius:12px;font-family:inherit;font-size:1rem;resize:vertical;transition:all 0.2s;box-sizing:border-box;background-color:#F8FAFC}
+        textarea:focus{outline:none;border-color:var(--primary-color);background-color:#fff;box-shadow:0 0 0 4px rgba(190,24,93,0.1)}
+        .btn{background-color:var(--primary-color);color:white;border:none;padding:16px 32px;border-radius:12px;font-weight:600;font-size:1rem;cursor:pointer;width:100%;margin-top:1.5rem;transition:background-color 0.2s,transform 0.2s}
+        .btn:hover{background-color:var(--primary-hover);transform:translateY(-2px)}
+        .btn:disabled{background-color:#9CA3AF;cursor:not-allowed;transform:none}
+        .suggestions-area{margin-top:40px;display:none}
+        .suggestion-card{background:#F8FAFC;border:1px solid var(--border);padding:20px;border-radius:10px;margin-bottom:16px}
+        .tag{font-size:0.75rem;text-transform:uppercase;font-weight:700;color:var(--primary-color);margin-bottom:8px;display:block;letter-spacing:0.5px}
+        .suggestion-text{font-size:1.05rem;line-height:1.6;color:var(--text-main)}
+        .right-panel{display:flex;flex-direction:column;align-items:center}
+        .chart-container{position:relative;width:200px;height:200px;margin-bottom:30px}
+        .circular-chart{transform:rotate(-90deg)}
+        .circle-bg{fill:none;stroke:#F1F5F9;stroke-width:12}
+        .circle{fill:none;stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1), stroke 0.5s}
+        .percentage{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+        .score-big{font-size:3rem;font-weight:700;color:#1E293B}
+        .score-label{font-size:0.875rem;color:var(--text-sub);text-transform:uppercase;letter-spacing:1px}
+        .stats-grid{width:100%;display:flex;flex-direction:column;gap:20px}
+        .stat-header{display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.9rem;font-weight:500}
+        .bar-bg{width:100%;height:8px;background:#E2E8F0;border-radius:4px;overflow:hidden}
+        .bar-fill{height:100%;width:0%;border-radius:4px;transition:width 1s cubic-bezier(0.25,1,0.5,1)}
+        @media (max-width:900px){.container{grid-template-columns:1fr}}
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="left-panel"><h1>Hook AI</h1><p class="subtitle">Get hook suggestions from a world-class AI, rebuilt to be impossible to ignore.</p><textarea id="inputHook" placeholder="Describe a pain point or a goal..."></textarea><button id="analyzeBtn" class="btn">Rebuild My Hook</button><div id="suggestionsBox" class="suggestions-area"><div class="suggestion-card"><span class="tag">Angle: The Direct Solution</span><p id="rewrite1" class="suggestion-text"></p></div><div class="suggestion-card"><span class="tag">Angle: The Empathy Bridge</span><p id="rewrite2" class="suggestion-text"></p></div><div class="suggestion-card"><span class="tag">Angle: The Intrigue Question</span><p id="rewrite3" class="suggestion-text"></p></div></div></div>
-        <div class="right-panel"><div class="stats-grid"><p class="powered-by">Powered by <br><strong>Google Gemini AI</strong></p></div></div>
+        <div class="left-panel">
+            <h1>Hookify AI</h1>
+            <p class="subtitle">Enter your hook to get an instant AI-powered analysis, a Heat Score, and three powerful, rewritten versions.</p>
+            <textarea id="inputHook" placeholder="e.g., 'Feeling stuck with content creation' or 'I want to teach people how to invest wisely'"></textarea>
+            <button id="analyzeBtn" class="btn">Analyze My Hook</button>
+            <div id="suggestionsBox" class="suggestions-area">
+                <div class="suggestion-card"><span class="tag">Angle: The Direct Solution</span><p id="rewrite1" class="suggestion-text"></p></div>
+                <div class="suggestion-card"><span class="tag">Angle: The Empathy Bridge</span><p id="rewrite2" class="suggestion-text"></p></div>
+                <div class="suggestion-card"><span class="tag">Angle: The Intrigue Question</span><p id="rewrite3" class="suggestion-text"></p></div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="chart-container">
+                <svg viewBox="0 0 100 100" class="circular-chart"><circle class="circle-bg" cx="50" cy="50" r="44"></circle><circle id="scoreCircle" class="circle" cx="50" cy="50" r="44" stroke-dasharray="276.4" stroke-dashoffset="276.4"></circle></svg>
+                <div class="percentage"><span id="mainScore" class="score-big">0</span><span class="score-label">Heat Score</span></div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item"><div class="stat-header"><span>Clarity</span><span id="clarityTxt">0/10</span></div><div class="bar-bg"><div id="clarityBar" class="bar-fill" style="background-color: #3B82F6;"></div></div></div>
+                <div class="stat-item"><div class="stat-header"><span>Intrigue</span><span id="intrigueTxt">0/10</span></div><div class="bar-bg"><div id="intrigueBar" class="bar-fill" style="background-color: #F59E0B;"></div></div></div>
+                <div class="stat-item"><div class="stat-header"><span>Impact</span><span id="impactTxt">0/10</span></div><div class="bar-bg"><div id="impactBar" class="bar-fill" style="background-color: #EF4444;"></div></div></div>
+                <div class="stat-item"><div class="stat-header"><span>Emotion</span><span id="emotionTxt">0/10</span></div><div class="bar-bg"><div id="emotionBar" class="bar-fill" style="background-color: #8B5CF6;"></div></div></div>
+            </div>
+        </div>
     </div>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const analyzeBtn = document.getElementById('analyzeBtn');
         const suggestionsBox = document.getElementById('suggestionsBox');
-        
-        // This is the special URL for our Netlify function
         const FUNCTION_URL = '/.netlify/functions/generate-hook';
 
         analyzeBtn.addEventListener('click', async () => {
             const hookInput = document.getElementById('inputHook').value.trim();
-            if (!hookInput) { return alert('Please enter a hook idea first.'); }
+            if (!hookInput) { return alert('Please enter a hook to analyze.'); }
 
             analyzeBtn.disabled = true;
-            analyzeBtn.textContent = 'Thinking...';
+            analyzeBtn.textContent = 'Analyzing...';
             suggestionsBox.style.display = 'none';
 
             try {
@@ -36,22 +85,57 @@
 
                 const data = await response.json();
                 
-                if (data.suggestions && data.suggestions.length === 3) {
-                    document.getElementById('rewrite1').textContent = data.suggestions[0];
-                    document.getElementById('rewrite2').textContent = data.suggestions[1];
-                    document.getElementById('rewrite3').textContent = data.suggestions[2];
-                    suggestionsBox.style.display = 'block';
-                } else { throw new Error('Invalid response format from AI.'); }
+                // We now have both analysis and suggestions from the AI
+                if (data.analysis && data.suggestions) {
+                    updateScoresUI(data.analysis);
+                    updateSuggestionsUI(data.suggestions);
+                } else { 
+                    throw new Error('Invalid JSON structure from AI.'); 
+                }
 
             } catch (error) {
-                console.error("Failed to fetch AI suggestions:", error);
-                alert("Sorry, something went wrong. Please check the console for details.");
+                console.error("Failed to fetch AI analysis:", error);
+                alert("Sorry, something went wrong while talking to the AI. Please try again.");
             } finally {
                 analyzeBtn.disabled = false;
-                analyzeBtn.textContent = 'Rebuild My Hook';
+                analyzeBtn.textContent = 'Analyze My Hook';
             }
         });
     });
+
+    function updateScoresUI(analysis) {
+        updateMainScoreUI(analysis.heatScore || 0);
+        setBar('clarity', analysis.clarity || 0);
+        setBar('intrigue', analysis.intrigue || 0);
+        setBar('impact', analysis.impact || 0);
+        setBar('emotion', analysis.emotion || 0);
+    }
+    
+    function updateSuggestionsUI(suggestions) {
+        document.getElementById('rewrite1').textContent = suggestions[0] || '';
+        document.getElementById('rewrite2').textContent = suggestions[1] || '';
+        document.getElementById('rewrite3').textContent = suggestions[2] || '';
+        document.getElementById('suggestionsBox').style.display = 'block';
+    }
+
+    function updateMainScoreUI(score) {
+        const circle = document.getElementById('scoreCircle');
+        const scoreText = document.getElementById('mainScore');
+        const circumference = 2 * Math.PI * 44; // 2 * pi * radius
+        const offset = circumference - (score / 100) * circumference;
+        
+        circle.style.strokeDashoffset = offset;
+        scoreText.textContent = score;
+
+        if (score < 45) circle.style.stroke = '#EF4444'; // Red
+        else if (score < 75) circle.style.stroke = '#F59E0B'; // Yellow
+        else circle.style.stroke = '#10B981'; // Green
+    }
+
+    function setBar(type, val) {
+        document.getElementById(`${type}Bar`).style.width = `${val * 10}%`;
+        document.getElementById(`${type}Txt`).textContent = `${val}/10`;
+    }
 </script>
 </body>
 </html>

@@ -13,7 +13,7 @@ exports.handler = async function (event, context) {
         const API_KEY = process.env.GEMINI_API_KEY;
 
         // **IMPORTANT**: The model name for the direct REST API is just "gemini-pro"
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
 
         const prompt = `
             You are an advanced hook analysis AI. A user has submitted a hook for review.

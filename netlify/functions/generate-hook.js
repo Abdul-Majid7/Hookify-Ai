@@ -10,7 +10,7 @@ exports.handler = async function (event, context) {
         if (!hook) { return { statusCode: 400, body: JSON.stringify({ error: 'No hook text provided.' }) }; }
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
+       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
         const prompt = `
             You are an advanced hook analysis AI. A user has submitted a hook for review.

@@ -1,73 +1,32 @@
-// File: netlify/functions/generate-hook.js
-// This version uses a direct fetch call, which is more reliable for free AI Studio keys.
+// DIAGNOSTIC TOOL - This code will get the list of available models.
 
 exports.handler = async function (event, context) {
-    if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: 'Method Not Allowed' };
-    }
     try {
-        const { hook } = JSON.parse(event.body);
-        if (!hook) { return { statusCode: 400, body: JSON.stringify({ error: 'No hook text provided.' }) }; }
-
-        // Get your secret key from Netlify's environment variables
         const API_KEY = process.env.GEMINI_API_KEY;
+        const LIST_MODELS_URL = `https://generativelanguage.googleapis.com/v1beta/models?key=${API_KEY}`;
 
-        // **IMPORTANT**: The model name for the direct REST API is just "gemini-pro"
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+        const response = await fetch(LIST_MODELS_URL);
+        const data = await response.json();
 
-        const prompt = `
-            You are an advanced hook analysis AI. A user has submitted a hook for review.
-            The user's hook is: "${hook}"
-
-            Your task is to perform two actions:
-            1. Analyze the hook: Rate it on a scale of 0-10 for four distinct criteria: Clarity, Intrigue, Impact, and Emotion.
-            2. Rewrite the hook: Generate three improved versions based on different psychological angles.
-
-            You MUST return your response as a single, valid JSON object. The JSON object must have two top-level keys: "analysis" and "suggestions".
-            The "analysis" object should contain the four scores and a final "heatScore" which is a weighted average.
-            The "suggestions" key should be an array of the three rewritten hook strings.
-
-            Here is the exact JSON format to follow:
-            {
-              "analysis": { "clarity": 8, "intrigue": 7, "impact": 6, "emotion": 5, "heatScore": 75 },
-              "suggestions": [ "Rewritten hook 1", "Rewritten hook 2", "Rewritten hook 3" ]
-            }
-        `;
-
-        // This is the data structure the direct API expects
-        const requestBody = {
-            contents: [{
-                parts: [{
-                    text: prompt
-                }]
-            }]
-        };
-
-        const apiResponse = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody)
-        });
-
-        if (!apiResponse.ok) {
-            const errorBody = await apiResponse.json();
-            console.error("Google AI Error:", errorBody);
-            return { statusCode: apiResponse.status, body: JSON.stringify({ error: 'Error from Google AI.', details: errorBody }) };
+        if (!response.ok) {
+            console.error("ERROR FETCHING MODELS:", data);
+            return { statusCode: 500, body: "Failed to fetch models. Check the log." };
         }
 
-        const responseData = await apiResponse.json();
-        const responseText = responseData.candidates[0].content.parts[0].text;
-        
+        // We will print the list of models to the function log.
+        console.log("SUCCESS! AVAILABLE MODELS:", JSON.stringify(data, null, 2));
+
+        // We will also return the list to the website's alert box.
         return {
             statusCode: 200,
-            body: responseText, // The AI's response is already a clean JSON string
+            body: JSON.stringify(data, null, 2),
         };
 
     } catch (error) {
-        console.error("Function crashed:", error);
+        console.error("FUNCTION CRASHED:", error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'The backend function encountered a critical error.' })
+            body: "The function crashed. Check the log."
         };
     }
 };

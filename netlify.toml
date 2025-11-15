@@ -1,6 +1,5 @@
 [build]
-  command = ""
-  publish = "/"
+command = ""
 
 [functions]
-  timeout = 28
+timeout = 28

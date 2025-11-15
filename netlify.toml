@@ -1,12 +1,6 @@
-# This section tells Netlify how to build the site.
 [build]
-  # We leave the command empty because we have no build step.
   command = ""
-  # We tell it the main `index.html` is in the root folder.
   publish = "/"
 
-# This section tells Netlify where to find the backend functions
-# and increases the timeout to 28 seconds.
 [functions]
-  directory = "netlify/functions/"
   timeout = 28
